@@ -1,8 +1,14 @@
-import React from 'react'
+import { landLogo } from '../assets';
 
 const Hero = () => {
   return (
-    <div>Hero</div>
+    <header className='w-full flex justify-center
+    items-center flex-col'>
+      <nav className='flex justify-between  
+      items-center flex-col'>
+          <img src={ landLogo }/>
+      </nav>
+    </header>
   )
 }
 
