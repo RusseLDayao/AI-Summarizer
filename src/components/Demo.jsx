@@ -1,8 +1,47 @@
 import { useState, useEffect } from "react"
 import { copy, link, loading, tick}  from
 '../assets'
+import { useLazyGetSummaryQuery } from "../Services/Artcile";
 
 const Demo = () => {
+  const [article, setArticle] = useState ({
+    url:'',
+    summary:'',
+  });
+  
+  const [allArticles, setAllArticles] = useState([]);
+
+
+  const [getSummary, {error, isFetching}] = useLazyGetSummaryQuery();
+
+  useEffect(() => {\
+    const articlesFromLocalStorage = JSON.parse(
+      localStorage.getItem('artciles')
+    )
+    if (articlesFromLocalStorage) {
+      setAllArticles(articlesFromLocalStorage)
+    }
+  }, [])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+      const {data} = await getSummary({
+        articleUrl: article.url
+      });
+
+      if (data?.summary) {
+        const newArticle = {
+          ...article, summary: data. summary
+        };
+
+        const updatedAllArticles = [newArtcile, ...allArticles]
+        setArticle(newArticle);
+        setAllArticles(updatedAllArticles);
+
+        console.log(newArticle);
+      }
+  }
   return (
     <section className='mt-16 w-full max-w-xl'>
       {/*Search*/}
@@ -10,7 +49,7 @@ const Demo = () => {
       gap-2'>
         <form className='relative flex 
         justify-center items-center'
-        onSubmit={() => {}} >
+        onSubmit={handleSubmit } >
           <img 
           src={link}
           alt='link_icon'
@@ -20,22 +59,23 @@ const Demo = () => {
           <input
           type='url'
           placeholder='Enter a URL'
-          value=''
-          onChange={() => {}}
+          value={article.url}
+          onChange={(e) => setArticle({
+            ...article, url: e.target.value})}
           required
           className='url_input peer'
           />
           <button
           type='submit'
           className='submit_btn'
-          peer-focus:border-gray-700
-          peer-focus:text-gray-700
           >
             ↩️
           </button>
         </form>
         {/*Browser URL history*/}
       </div>
+
+      {/*Display result */}
     </section>
   )
 }
